@@ -1,36 +1,44 @@
-// const http = require('https');
-// const hostname = '127.0.0.1';
-const dotenv = require('dotenv');
-dotenv.config({ path: './config.env' });
+// Import required modules
 const express = require('express');
 const connectDB = require('./connection.js');
 const cookieParser = require("cookie-parser");
+const cors = require('cors')
+
+// Create an Express application
 const app = express();
+
+// Connect to the database
 connectDB();
+
+app.use(cors())
+
+// Middleware to parse JSON requests
 app.use(express.json());
+
+// Middleware to parse cookies
 app.use(cookieParser());
-app.use(express.urlencoded({extended:true}));
-const ejs= require('ejs');
 
+// Middleware to parse URL-encoded requests
+app.use(express.urlencoded({ extended: true }));
 
+// Import and use registration router
 app.use(require('./router/regi'));
+
+// Import and use authentication router
 app.use(require('./router/Au'));
 
-const port = process.env.PORT;
-
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World! From OpenLiteSpeed NodeJS\n');
+// home
+app.get('/',(req,res)=>{
+    res.json({message:'Hello world'})
 });
 
-app.use(express.static("Public"));
-const path = require("path");
-app.get("*", (req, res) => {
+// Define the port number, using the environment variable PORT or default to 3000
+const port = process.env.PORT || 3000;
 
-        res.sendFile(path.resolve(__dirname, 'Public', 'index.html'));
+// Log the port number to the console
+console.log(`Server will listen on port ${port}`);
 
-    })
-app.listen(port, ()=>{
-    console.log(`server running port ${port}`);
+// Start the Express server
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
